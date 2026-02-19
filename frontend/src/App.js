@@ -7,6 +7,25 @@ import PrestamoCrud from './components/prestamo/PrestamoCrud';
 import RolCrud from './components/rol/RolCrud';
 
 export default function App() {
+
+  //Estado que indica si el usuario está logueado 
+  const [logged, setLogged] = useState(!!localStorage.getItem('auth')); 
+  
+  function handleLogin() { 
+    setLogged(true); 
+  } 
+  
+  function handleLogout() { 
+    localStorage.removeItem('auth'); 
+    setLogged(false); 
+  } 
+  
+  // Si NO está logueado → mostrar login 
+  if (!logged) { 
+    return <Login onLogin={handleLogin} />; 
+  }
+
+  //Si está logueado → mostrar la app completa
   return (
     <BrowserRouter>
       <header className="app-header">
