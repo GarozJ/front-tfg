@@ -140,7 +140,7 @@ export default function UsuarioCrud() {
 import React, { useState, useEffect } from 'react';
 import { getUsuarios, createUsuario, updateUsuario, deleteUsuario } from '../../api/apiClient';
 import CollectionView from '../common/CollectionView';
-import FormComponent from '../common/FormComponent';git show --pretty="" --name-only
+import FormComponent from '../common/FormComponent';
 
 import TableActions from '../common/TableActions';
 
