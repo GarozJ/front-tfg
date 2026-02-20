@@ -3,6 +3,16 @@ import axios from 'axios';
 const BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:9012';
 const api = axios.create({ baseURL: BASE });
 
+// Interceptor para añadir Basic Auth si existe en localStorage
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("auth");
+  if (token) {
+    config.headers.Authorization = `Basic ${token}`;
+  }
+  return config;
+});
+
+
 // Usuario
 export const getUsuarios = () => api.get('/usuario/all').then(r => r.data);
 export const getUsuario = (id) => api.get(`/usuario/byId/${id}`).then(r => r.data);

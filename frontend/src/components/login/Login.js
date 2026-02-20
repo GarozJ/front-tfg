@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api/apiClient';
+import api from '../../api/apiClient';
 
 //Recibe una llamada onLogin que se ejecutará cuando el login sea correcto
 export default function Login({ onLogin }) {
@@ -8,25 +8,25 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = (e) => { 
     e.preventDefault(); 
-  //Hacemos login 
-  api.post("/login", { email, password }) 
-    .then(() => { 
-      // Guardamos que el usuario está autenticado 
-      localStorage.setItem("auth", "true");
-      //Obtenemos email + roles del usuario autenticado 
-      api.get("/usuario/me") 
-        .then((res) => { 
-          const user = { 
-            email: res.data.email, 
-            roles: res.data.roles.map((r) => r.authority) 
-          }; 
-          //Enviamos el usuario a App.js 
-          onLogin(user); 
-        }) 
-        .catch(() => { 
-          alert("Error obteniendo datos del usuario"); 
-          localStorage.removeItem("auth"); 
-        }); 
+  
+    //Llamamos a un endpoint protegido usando Basic Auth 
+    api.get("/usuario/me", { 
+      auth: { 
+        username: email, 
+        password: password 
+      } 
+    }) 
+      .then((res) => { 
+        //Guardamos las credenciales en localStorage (codificadas en base64) 
+        const token = btoa(`${email}:${password}`); 
+        localStorage.setItem("auth", token); 
+        
+        const user = { 
+          email: res.data.email, 
+          roles: res.data.roles.map((r) => r.authority) 
+        }; 
+        
+        onLogin(user); 
       }) 
       .catch(() => { 
         alert("Credenciales incorrectas"); 

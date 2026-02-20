@@ -33,6 +33,7 @@ build/
 .vscode/
 
 ### FRONTEND ###
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
+node_modules/
+dist/
+build/
+.env
