@@ -9,12 +9,23 @@ export default function LibroCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => { load(); }, []);
 
   function load() {
     getLibros().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
   }
+
+  //Valores vacíos para crear 
+  const emptyValues = { 
+    titulo: "", 
+    autor: "", 
+    editorial: "", 
+    categoria: "", 
+    isbn: "", 
+    imagen: ""
+  };
 
   function handleCreate(data) {
     setLoading(true);
@@ -25,17 +36,38 @@ export default function LibroCrud() {
   }
 
   function handleEdit(id) {
+    const libro = items.find(l => l.idLibro === id);
     setEditingId(id);
+    setInitialValues({
+      idLibro: libro.idLibro,
+      titulo: libro.titulo,
+      autor: libro.autor,
+      editorial: libro.editorial,
+      categoria: libro.categoria,
+      isbn: libro.isbn,
+      imagen: libro.imagen
+    });
     setShowForm(true);
   }
 
-  function handleUpdate(data) {
-    setLoading(true);
-    updateLibro(editingId, data)
-      .then(() => { load(); setShowForm(false); setEditingId(null); })
-      .catch(e => alert('Error al actualizar: ' + e.message))
-      .finally(() => setLoading(false));
-  }
+  // SUBMIT GENERAL → decide si crear o editar
+    function handleSubmit(data) {
+      setLoading(true);
+  
+      if (editingId !==null) {
+        updateLibro(editingId, data)
+          .then(() => {
+            load();
+            setShowForm(false);
+            setEditingId(null);
+            setInitialValues({});
+          })
+          .catch(e => alert("Error al actualizar: " + e.message))
+          .finally(() => setLoading(false));
+      } else {
+        handleCreate(data);
+      }
+    }
 
   function handleDelete(id) {
     if (window.confirm('¿Eliminar este libro?')) {
@@ -49,23 +81,39 @@ export default function LibroCrud() {
     { key: 'idLibro', label: 'ID' },
     { key: 'titulo', label: 'Título' },
     { key: 'autor', label: 'Autor' },
+    { key: 'editorial', label: 'Editorial' }, 
+    { key: 'categoria', label: 'Categoría' }, 
+    { key: 'isbn', label: 'ISBN' },
+    { 
+      key: 'imagen', 
+      label: 'Imagen', 
+      render: (item) => ( 
+        <img src={item.imagen} alt={item.titulo} 
+        style={{ width: 60, height: 'auto', borderRadius: 4 }} 
+        /> 
+      ) 
+    },
     {
       key: 'actions',
       label: 'Acciones',
-      render: (item) => (
+      render: (item) => {
+        return(
         <TableActions
-          onEdit={() => handleEdit(item.id)}
-          onDelete={() => handleDelete(item.id)}
-        />
-      )
+          onEdit={() => handleEdit(item.idLibro)}
+          onDelete={() => handleDelete(item.idLibro)}
+        />  
+      );
+      }
     }
   ];
 
   const formFields = [
     { key: 'titulo', label: 'Título', placeholder: 'Título del libro' },
     { key: 'autor', label: 'Autor', placeholder: 'Autor' },
+    { key: 'editorial', label: 'Editorial', placeholder: 'Editorial' },
+    { key: 'categoria', label: 'Categoría', placeholder: 'Categoría' },
     { key: 'isbn', label: 'ISBN', placeholder: 'ISBN' },
-    { key: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: 'Descripción' }
+    { key: 'imagen', label: 'Imagen', placeholder: 'Link de la imagen' }
   ];
 
   return (
@@ -79,9 +127,11 @@ export default function LibroCrud() {
 
         {showForm && (
           <FormComponent
+            key={editingId ?? 'new'} 
             title={editingId ? 'Editar Libro' : 'Crear Libro'}
             fields={formFields}
-            onSubmit={editingId ? handleUpdate : handleCreate}
+            initialValues={initialValues ?? emptyValues}
+            onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
             loading={loading}
           />

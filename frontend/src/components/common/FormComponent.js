@@ -80,7 +80,7 @@ export default function FormComponent({
 
   React.useEffect(() => {
     setData(initialValues);
-  }, [initialValues]);
+  }, []);
 
   const handleChange = (key, value) => {
     setData({ ...data, [key]: value });
@@ -101,33 +101,43 @@ export default function FormComponent({
         gap: 12
       }}>
         {fields.map(f => (
-          <div key={f.key}>
-            <label style={{
-              display: 'block',
-              marginBottom: 4,
-              fontSize: 13,
-              fontWeight: 600
-            }}>
-              {f.label}
-            </label>
-
-            <input
-              type={f.type || 'text'}
-              className="input"
-              style={{ width: '100%' }}
-              value={data[f.key] || ''}
-              onChange={e => handleChange(f.key, e.target.value)}
-              placeholder={f.placeholder || ''}
-              autoComplete="off"
-              name={`no-autofill-${f.key}`}
-            />
-          </div>
+          <div key={f.key}> 
+            <label 
+            style={{ 
+              display: 'block', 
+              marginBottom: 4, 
+              fontSize: 13, 
+              fontWeight: 600 
+            }}> 
+              {f.label} 
+            </label> 
+            {f.type === 'textarea' ? ( 
+              <textarea 
+                className="input" 
+                style={{ width: '100%', minHeight: 80 }} 
+                value={data[f.key] || ''} 
+                onChange={e => handleChange(f.key, e.target.value)} 
+                placeholder={f.placeholder || ''} 
+                autoComplete="off" 
+                name={`no-autofill-${f.key}`} /> 
+            ) : ( 
+              <input type={f.type || 'text'} 
+                className="input" 
+                style={{ width: '100%' }} 
+                value={data[f.key] || ''} 
+                onChange={e => handleChange(f.key, e.target.value)} 
+                placeholder={f.placeholder || ''} 
+                autoComplete="off" 
+                name={`no-autofill-${f.key}`} 
+                /> 
+              )} 
+            </div>
         ))}
       </div>
 
       <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-        <button className="btn" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Guardando...' : 'Guardar'}
+        <button className="btn" onClick={handleSubmit} disabled={loading}> 
+          {loading ? 'Guardando...' : (initialValues?.idUsuario ? 'Actualizar' : 'Guardar')} 
         </button>
         <button className="btn secondary" onClick={onCancel}>Cancelar</button>
       </div>

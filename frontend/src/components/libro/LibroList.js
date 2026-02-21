@@ -12,9 +12,14 @@ export default function LibroList() {
   function fetchOne() { if (!id) return alert('Pon un id'); getLibro(id).then(setOne).catch(e => alert('Error: ' + e)); }
 
   const columns = [
-    { key: 'id', label: 'ID' },
+    { key: 'idLibro', label: 'ID' },
     { key: 'titulo', label: 'Título' },
-    { key: 'autor', label: 'Autor' }
+    { key: 'autor', label: 'Autor' },
+    { key: 'editorial', label: 'Editorial', placeholder: 'Editorial' },
+    { key: 'categoria', label: 'Categoría', placeholder: 'Categoría' },
+    { key: 'isbn', label: 'ISBN', placeholder: 'ISBN' },
+    { key: 'imagen', label: 'Imagen', placeholder: 'Link de la imagen' },
+    { key: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: 'Descripción' }
   ];
 
   return (

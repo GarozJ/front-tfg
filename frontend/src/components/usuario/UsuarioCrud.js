@@ -168,11 +168,17 @@ export default function UsuarioCrud() {
 
   // EDITAR → carga datos en el formulario
   function handleEdit(id) {
-    const usuario = items.find(u => u.idUsuario === id);
+    
+    console.log("ID recibido:", id); 
+    console.log("Items:", items);
+    
+    const usuario = items.find(u => u.usuarioId === id);
+    console.log("Usuario encontrado:", usuario);
 
     setEditingId(id);
 
     setInitialValues({
+      idUsuario: usuario.idUsuario,
       nombre: usuario.nombre,
       apellidos: usuario.apellidos,
       email: usuario.email,
@@ -187,7 +193,7 @@ export default function UsuarioCrud() {
   function handleSubmit(data) {
     setLoading(true);
 
-    if (editingId) {
+    if (editingId !==null) {
       updateUsuario(editingId, data)
         .then(() => {
           load();
@@ -219,12 +225,15 @@ export default function UsuarioCrud() {
     {
       key: 'actions',
       label: 'Acciones',
-      render: (item) => (
-        <TableActions
-          onEdit={() => handleEdit(item.idUsuario)}
-          onDelete={() => handleDelete(item.idUsuario)}
-        />
-      )
+      render: (item) => { 
+        console.log("ITEM EN COLUMNAS:", item); 
+        return ( <TableActions 
+          id={item.usuarioId} 
+          onEdit={handleEdit} 
+          onDelete={() => handleDelete(item.usuarioId)} 
+          /> 
+        ); 
+      }
     }
   ];
 
@@ -250,16 +259,13 @@ export default function UsuarioCrud() {
         </div>
 
         {showForm && (
-          <FormComponent
-            title={editingId ? 'Editar Usuario' : 'Crear Usuario'}
+          <FormComponent 
+            key={editingId ?? 'new'} 
+            title={editingId !==null ? "Editar Usuario" : "Crear Usuario"} 
+            initialValues={initialValues} 
+            onSubmit={handleSubmit} 
+            onCancel={() => { setShowForm(false); setEditingId(null); }}
             fields={formFields}
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-            onCancel={() => { 
-              setShowForm(false); 
-              setEditingId(null); 
-              setInitialValues({});
-            }}
             loading={loading}
           />
         )}
