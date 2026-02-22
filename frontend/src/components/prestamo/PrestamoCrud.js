@@ -9,6 +9,7 @@ export default function PrestamoCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({});
 
   useEffect(() => { load(); }, []);
 
@@ -25,16 +26,41 @@ export default function PrestamoCrud() {
   }
 
   function handleEdit(id) {
-    setEditingId(id);
-    setShowForm(true);
-  }
-
-  function handleUpdate(data) {
-    setLoading(true);
-    updatePrestamo(editingId, data)
-      .then(() => { load(); setShowForm(false); setEditingId(null); })
-      .catch(e => alert('Error al actualizar: ' + e.message))
-      .finally(() => setLoading(false));
+     const prestamo = items.find(p => p.idPrestamo === id);
+    
+        setEditingId(id);
+    
+        setInitialValues({
+          idPrestamo: prestamo.idPrestamo,
+          fechaInicio: prestamo.fechaInicio,
+          fechaFin: prestamo.fechaFin,
+          fechaDevolucion: prestamo.fechaDevolucion,
+          diasRetraso: prestamo.diasRetraso,
+          importeSancion: prestamo.importeSancion,
+          idUsuario: prestamo.idUsuario,
+          idLibro: prestamo.idLibro
+        });
+    
+        setShowForm(true);
+      }
+    
+       // SUBMIT GENERAL → decide si crear o editar
+        function handleSubmit(data) {
+          setLoading(true);
+      
+          if (editingId !==null) {
+            updatePrestamo(editingId, data)
+              .then(() => {
+                load();
+                setShowForm(false);
+                setEditingId(null);
+                setInitialValues({});
+              })
+              .catch(e => alert("Error al actualizar: " + e.message))
+              .finally(() => setLoading(false));
+          } else {
+            handleCreate(data);
+          }
   }
 
   function handleDelete(id) {
@@ -46,9 +72,9 @@ export default function PrestamoCrud() {
   }
 
   const columns = [
-    { key: 'id', label: 'ID' },
-    { key: 'usuario', label: 'Usuario', render: (item) => item.usuario ? item.usuario.nombre : 'N/A' },
-    { key: 'libro', label: 'Libro', render: (item) => item.libro ? item.libro.titulo : 'N/A' },
+    { key: 'idPrestamo', label: 'ID' },
+    { key: 'usuario', label: 'Usuario', render:  (item) => item.nombreUsuario || 'N/A'},
+    { key: 'libro', label: 'Libro', render: (item) => item.tituloLibro || 'N/A' },
     { key: 'fechaInicio', label: 'Desde' },
     { key: 'fechaFin', label: 'Hasta' },
     {
@@ -56,16 +82,16 @@ export default function PrestamoCrud() {
       label: 'Acciones',
       render: (item) => (
         <TableActions
-          onEdit={() => handleEdit(item.id)}
-          onDelete={() => handleDelete(item.id)}
+          onEdit={() => handleEdit(item.idPrestamo)}
+          onDelete={() => handleDelete(item.idPrestamo)}
         />
       )
     }
   ];
 
   const formFields = [
-    { key: 'usuarioId', label: 'ID Usuario', type: 'number', placeholder: 'ID del usuario' },
-    { key: 'libroId', label: 'ID Libro', type: 'number', placeholder: 'ID del libro' },
+    { key: 'idUsuario', label: 'ID Usuario', type: 'number', placeholder: 'ID del usuario' },
+    { key: 'idLibro', label: 'ID Libro', type: 'number', placeholder: 'ID del libro' },
     { key: 'fechaInicio', label: 'Fecha Inicio', type: 'date' },
     { key: 'fechaFin', label: 'Fecha Fin', type: 'date' }
   ];
@@ -81,10 +107,12 @@ export default function PrestamoCrud() {
 
         {showForm && (
           <FormComponent
+            key={editingId ?? 'new'}
             title={editingId ? 'Editar Préstamo' : 'Crear Préstamo'}
-            fields={formFields}
-            onSubmit={editingId ? handleUpdate : handleCreate}
+            initialValues={initialValues} 
+            onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
+            fields={formFields}
             loading={loading}
           />
         )}
