@@ -229,7 +229,7 @@ export default function UsuarioCrud() {
         console.log("ITEM EN COLUMNAS:", item); 
         return ( <TableActions 
           id={item.usuarioId} 
-          onEdit={handleEdit} 
+          onEdit={() => handleEdit(item.usuarioId)}
           onDelete={() => handleDelete(item.usuarioId)} 
           /> 
         ); 

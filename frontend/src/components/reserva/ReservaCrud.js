@@ -9,11 +9,12 @@ export default function ReservaCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({});
 
   useEffect(() => { load(); }, []);
 
   function load() {
-    getReservas().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
+    getReservas().then(data => { console.log("RESERVAS RECIBIDAS:", data); setItems(data); }).catch(e => alert('Error al cargar: ' + e.message));
   }
 
   function handleCreate(data) {
@@ -25,17 +26,40 @@ export default function ReservaCrud() {
   }
 
   function handleEdit(id) {
+    
+    const reserva = items.find(r => r.idReserva === id);
+
     setEditingId(id);
+
+    setInitialValues({
+      idReserva: reserva.idReserva,
+      fechaReserva: reserva.fechaReserva,
+      activa: reserva.activa,
+      idUsuario: reserva.idUsuario,
+      idLibro: reserva.idLibro
+    });
+
     setShowForm(true);
   }
 
-  function handleUpdate(data) {
-    setLoading(true);
-    updateReserva(editingId, data)
-      .then(() => { load(); setShowForm(false); setEditingId(null); })
-      .catch(e => alert('Error al actualizar: ' + e.message))
-      .finally(() => setLoading(false));
-  }
+   // SUBMIT GENERAL → decide si crear o editar
+    function handleSubmit(data) {
+      setLoading(true);
+  
+      if (editingId !==null) {
+        updateReserva(editingId, data)
+          .then(() => {
+            load();
+            setShowForm(false);
+            setEditingId(null);
+            setInitialValues({});
+          })
+          .catch(e => alert("Error al actualizar: " + e.message))
+          .finally(() => setLoading(false));
+      } else {
+        handleCreate(data);
+      }
+    }
 
   function handleDelete(id) {
     if (window.confirm('¿Eliminar esta reserva?')) {
@@ -46,25 +70,25 @@ export default function ReservaCrud() {
   }
 
   const columns = [
-    { key: 'id', label: 'ID' },
-    { key: 'usuario', label: 'Usuario', render: (item) => item.usuario ? item.usuario.nombre : 'N/A' },
-    { key: 'libro', label: 'Libro', render: (item) => item.libro ? item.libro.titulo : 'N/A' },
+    { key: 'idReserva', label: 'ID' },
+    { key: 'nombreUsuario', label: 'Usuario', render: (item) => item.nombreUsuario || 'N/A' },
+    { key: 'tituloLibro', label: 'Libro', render: (item) => item.tituloLibro || 'N/A' },
     { key: 'fechaReserva', label: 'Fecha Reserva' },
     {
       key: 'actions',
       label: 'Acciones',
       render: (item) => (
         <TableActions
-          onEdit={() => handleEdit(item.id)}
-          onDelete={() => handleDelete(item.id)}
+          onEdit={() => handleEdit(item.idReserva)}
+          onDelete={() => handleDelete(item.idReserva)}
         />
       )
     }
   ];
 
   const formFields = [
-    { key: 'usuarioId', label: 'ID Usuario', type: 'number', placeholder: 'ID del usuario' },
-    { key: 'libroId', label: 'ID Libro', type: 'number', placeholder: 'ID del libro' },
+    { key: 'idUsuario', label: 'ID Usuario', type: 'number', placeholder: 'ID del usuario' },
+    { key: 'idLibro', label: 'ID Libro', type: 'number', placeholder: 'ID del libro' },
     { key: 'fechaReserva', label: 'Fecha Reserva', type: 'date' }
   ];
 
@@ -79,10 +103,12 @@ export default function ReservaCrud() {
 
         {showForm && (
           <FormComponent
+            key={editingId ?? 'new'}
             title={editingId ? 'Editar Reserva' : 'Crear Reserva'}
-            fields={formFields}
-            onSubmit={editingId ? handleUpdate : handleCreate}
+            initialValues={initialValues} 
+            onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
+            fields={formFields}
             loading={loading}
           />
         )}
