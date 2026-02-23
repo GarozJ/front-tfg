@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:9012';
-const api = axios.create({ baseURL: BASE });
+const api = axios.create({ 
+  baseURL: BASE,
+  headers: { "Content-Type": "application/json" }
+});
 
 // Interceptor para añadir Basic Auth si existe en localStorage
 api.interceptors.request.use((config) => {

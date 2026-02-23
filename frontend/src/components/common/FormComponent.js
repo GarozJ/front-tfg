@@ -80,15 +80,15 @@ export default function FormComponent({
 
   React.useEffect(() => {
     setData(initialValues);
-  }, []);
+  }, [initialValues]);
 
   const handleChange = (key, value) => {
     setData({ ...data, [key]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     onSubmit(data);
-    setData({});
   };
 
   return (

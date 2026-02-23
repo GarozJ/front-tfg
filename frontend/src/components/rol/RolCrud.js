@@ -9,6 +9,7 @@ export default function RolCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => { load(); }, []);
 
@@ -16,27 +17,48 @@ export default function RolCrud() {
     getRoles().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
   }
 
+  //Valores vacíos para crear 
+  const emptyValues = { 
+    nombre: ""
+  };
+
   function handleCreate(data) {
     setLoading(true);
     // Para crear rol, solo necesitamos el nombre (string)
-    createRol(data.rol)
+    createRol(data)
       .then(() => { load(); setShowForm(false); })
       .catch(e => alert('Error al crear: ' + e.message))
       .finally(() => setLoading(false));
   }
 
   function handleEdit(id) {
+    const rol = items.find(r => r.idRol === id);
     setEditingId(id);
+    setInitialValues({
+      nombre: rol.nombre
+    });
     setShowForm(true);
   }
 
-  function handleUpdate(data) {
-    setLoading(true);
-    updateRol(editingId, data)
-      .then(() => { load(); setShowForm(false); setEditingId(null); })
-      .catch(e => alert('Error al actualizar: ' + e.message))
-      .finally(() => setLoading(false));
-  }
+  // SUBMIT GENERAL → decide si crear o editar
+      function handleSubmit(data) {
+        setLoading(true);
+    
+        if (editingId !==null) {
+          updateRol(editingId, data)
+            .then(() => {
+              load();
+              setShowForm(false);
+              setEditingId(null);
+              setInitialValues({});
+            })
+            .catch(e => alert("Error al actualizar: " + e.message))
+            .finally(() => setLoading(false));
+        } else {
+          handleCreate(data);
+        }
+      }
+  
 
   function handleDelete(id) {
     if (window.confirm('¿Eliminar este rol?')) {
@@ -54,15 +76,15 @@ export default function RolCrud() {
       label: 'Acciones',
       render: (item) => (
         <TableActions
-          onEdit={() => handleEdit(item.id)}
-          onDelete={() => handleDelete(item.id)}
+          onEdit={() => handleEdit(item.idRol)}
+          onDelete={() => handleDelete(item.idRol)}
         />
       )
     }
   ];
 
   const formFields = [
-    { key: 'rol', label: 'Nombre del Rol', placeholder: 'Ej: ADMIN, USER' }
+    { key: 'nombre', label: 'Nombre del Rol', placeholder: 'Ej: ADMIN, USER' }
   ];
 
   return (
@@ -78,7 +100,8 @@ export default function RolCrud() {
           <FormComponent
             title={editingId ? 'Editar Rol' : 'Crear Rol'}
             fields={formFields}
-            onSubmit={editingId ? handleUpdate : handleCreate}
+            initialValues={initialValues ?? emptyValues}
+            onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
             loading={loading}
           />
