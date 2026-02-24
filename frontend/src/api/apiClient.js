@@ -47,7 +47,7 @@ export const deletePrestamo = (id) => api.delete(`/prestamo/delete/${id}`).then(
 // Rol (endpoints in backend use slightly different signatures)
 export const getRoles = () => api.get('/rol/all').then(r => r.data);
 export const getRol = (id) => api.get(`/rol/findById/${id}`).then(r => r.data);
-export const createRol = (rolName) => api.post(`/rol/create/${encodeURIComponent(rolName)}`).then(r => r.data);
+export const createRol = (data) => api.post(`/rol/create/${encodeURIComponent(data.nombre)}`).then(r => r.data);
 export const updateRol = (id, data) => api.put(`/rol/update/${id}`, data).then(r => r.data);
 export const deleteRol = (id) => api.delete(`/rol/delete/${id}`).then(r => r.data);
 

@@ -50,7 +50,7 @@ export default function RolCrud() {
               load();
               setShowForm(false);
               setEditingId(null);
-              setInitialValues({});
+              setInitialValues(emptyValues);
             })
             .catch(e => alert("Error al actualizar: " + e.message))
             .finally(() => setLoading(false));

@@ -80,7 +80,7 @@ export default function PrestamoCrud() {
     { key: 'usuario', label: 'Usuario', render:  (item) => item.nombreUsuario || 'N/A'},
     { key: 'libro', label: 'Libro', render: (item) => item.tituloLibro || 'N/A' },
     { key: 'fechaInicio', label: 'Desde' },
-    { key: 'fechaFin', label: 'Hasta' },
+    { key: 'fechaFin', label: 'Hasta'},
     {
       key: 'actions',
       label: 'Acciones',
@@ -96,8 +96,7 @@ export default function PrestamoCrud() {
   const formFields = [
     { key: 'idUsuario', label: 'ID Usuario', type: 'number', placeholder: 'ID del usuario' },
     { key: 'idLibro', label: 'ID Libro', type: 'number', placeholder: 'ID del libro' },
-    { key: 'fechaInicio', label: 'Fecha Inicio', type: 'date' },
-    { key: 'fechaFin', label: 'Fecha Fin', type: 'date' }
+    { key: 'fechaInicio', label: 'Fecha Inicio', type: 'date' }
   ];
 
   return (

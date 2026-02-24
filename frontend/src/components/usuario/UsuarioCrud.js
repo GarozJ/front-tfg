@@ -244,7 +244,8 @@ export default function UsuarioCrud() {
     { key: 'nombre', label: 'Nombre', placeholder: 'Nombre del usuario' },
     { key: 'apellidos', label: 'Apellidos', placeholder: 'Apellidos del usuario' },
     { key: 'email', label: 'Email', placeholder: 'email@example.com' },
-    { key: 'password', label: 'Contraseña', type: 'password', placeholder: 'Nueva contraseña (opcional)' }
+    { key: 'password', label: 'Contraseña', type: 'password', placeholder: 'Nueva contraseña (opcional)' },
+    { key: 'rol', label: 'Rol', placeholder: 'ADMIN, BIBLIOTECARIO o USUARIO'}
   ];
 
   return (
