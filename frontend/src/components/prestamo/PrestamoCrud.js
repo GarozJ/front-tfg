@@ -9,7 +9,14 @@ export default function PrestamoCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState({});
+  //Valores vacíos para crear 
+  const emptyValues = { 
+    idUsuario: "", 
+    idLibro: "", 
+    fechaInicio: "", 
+    fechaFin: ""
+  };
+  const [initialValues, setInitialValues] = useState(emptyValues);
 
   useEffect(() => { load(); }, []);
 
@@ -31,36 +38,33 @@ export default function PrestamoCrud() {
         setEditingId(id);
     
         setInitialValues({
-          idPrestamo: prestamo.idPrestamo,
-          fechaInicio: prestamo.fechaInicio,
-          fechaFin: prestamo.fechaFin,
-          fechaDevolucion: prestamo.fechaDevolucion,
-          diasRetraso: prestamo.diasRetraso,
-          importeSancion: prestamo.importeSancion,
-          idUsuario: prestamo.idUsuario,
-          idLibro: prestamo.idLibro
+          idPrestamo: prestamo.idPrestamo, 
+          idUsuario: prestamo.idUsuario, 
+          idLibro: prestamo.idLibro, 
+          fechaInicio: prestamo.fechaInicio, 
+          fechaFin: prestamo.fechaFin
         });
     
         setShowForm(true);
-      }
+   }
     
-       // SUBMIT GENERAL → decide si crear o editar
-        function handleSubmit(data) {
-          setLoading(true);
-      
-          if (editingId !==null) {
-            updatePrestamo(editingId, data)
-              .then(() => {
-                load();
-                setShowForm(false);
-                setEditingId(null);
-                setInitialValues({});
-              })
-              .catch(e => alert("Error al actualizar: " + e.message))
-              .finally(() => setLoading(false));
-          } else {
-            handleCreate(data);
-          }
+  // SUBMIT GENERAL → decide si crear o editar
+  function handleSubmit(data) {
+    setLoading(true);
+
+    if (editingId !==null) {
+      updatePrestamo(editingId, data)
+        .then(() => {
+          load();
+          setShowForm(false);
+          setEditingId(null);
+          setInitialValues({});
+        })
+        .catch(e => alert("Error al actualizar: " + e.message))
+        .finally(() => setLoading(false));
+    } else {
+      handleCreate(data);
+    }
   }
 
   function handleDelete(id) {
@@ -100,7 +104,11 @@ export default function PrestamoCrud() {
     <div>
       <CollectionView title="Préstamos" items={items} columns={columns} onRefresh={load}>
         <div style={{marginTop: 12}}>
-          <button className="btn" onClick={() => { setShowForm(!showForm); setEditingId(null); }}>
+          <button className="btn" onClick={() => { 
+            setInitialValues(emptyValues); 
+            setEditingId(null); 
+            setShowForm(true); 
+            }}>
             {showForm ? 'Ocultar formulario' : '+ Nuevo Préstamo'}
           </button>
         </div>
@@ -109,10 +117,10 @@ export default function PrestamoCrud() {
           <FormComponent
             key={editingId ?? 'new'}
             title={editingId ? 'Editar Préstamo' : 'Crear Préstamo'}
+            fields={formFields}
             initialValues={initialValues} 
             onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
-            fields={formFields}
             loading={loading}
           />
         )}

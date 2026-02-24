@@ -9,7 +9,11 @@ export default function RolCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState(null);
+  //Valores vacíos para crear 
+  const emptyValues = { 
+    nombre: ""
+  };
+  const [initialValues, setInitialValues] = useState(emptyValues);
 
   useEffect(() => { load(); }, []);
 
@@ -17,14 +21,9 @@ export default function RolCrud() {
     getRoles().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
   }
 
-  //Valores vacíos para crear 
-  const emptyValues = { 
-    nombre: ""
-  };
 
   function handleCreate(data) {
     setLoading(true);
-    // Para crear rol, solo necesitamos el nombre (string)
     createRol(data)
       .then(() => { load(); setShowForm(false); })
       .catch(e => alert('Error al crear: ' + e.message))
@@ -35,6 +34,7 @@ export default function RolCrud() {
     const rol = items.find(r => r.idRol === id);
     setEditingId(id);
     setInitialValues({
+      idRol: rol.idRol,
       nombre: rol.nombre
     });
     setShowForm(true);
@@ -91,7 +91,11 @@ export default function RolCrud() {
     <div>
       <CollectionView title="Roles" items={items} columns={columns} onRefresh={load}>
         <div style={{marginTop: 12}}>
-          <button className="btn" onClick={() => { setShowForm(!showForm); setEditingId(null); }}>
+          <button className="btn" onClick={() => { 
+            setInitialValues(emptyValues); 
+            setEditingId(null); 
+            setShowForm(true);
+            }}>
             {showForm ? 'Ocultar formulario' : '+ Nuevo Rol'}
           </button>
         </div>
@@ -100,7 +104,7 @@ export default function RolCrud() {
           <FormComponent
             title={editingId ? 'Editar Rol' : 'Crear Rol'}
             fields={formFields}
-            initialValues={initialValues ?? emptyValues}
+            initialValues={initialValues}
             onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
             loading={loading}

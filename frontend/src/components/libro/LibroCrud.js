@@ -9,14 +9,6 @@ export default function LibroCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState(null);
-
-  useEffect(() => { load(); }, []);
-
-  function load() {
-    getLibros().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
-  }
-
   //Valores vacíos para crear 
   const emptyValues = { 
     titulo: "", 
@@ -26,6 +18,13 @@ export default function LibroCrud() {
     isbn: "", 
     imagen: ""
   };
+  const [initialValues, setInitialValues] = useState(emptyValues);
+
+  useEffect(() => { load(); }, []);
+
+  function load() {
+    getLibros().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
+  }
 
   function handleCreate(data) {
     setLoading(true);
@@ -120,7 +119,11 @@ export default function LibroCrud() {
     <div>
       <CollectionView title="Libros" items={items} columns={columns} onRefresh={load}>
         <div style={{marginTop: 12}}>
-          <button className="btn" onClick={() => { setShowForm(!showForm); setEditingId(null); }}>
+          <button className="btn" onClick={() => { 
+            setInitialValues(emptyValues); 
+            setEditingId(null); 
+            setShowForm(true);
+            }}>
             {showForm ? 'Ocultar formulario' : '+ Nuevo Libro'}
           </button>
         </div>
@@ -130,7 +133,7 @@ export default function LibroCrud() {
             key={editingId ?? 'new'} 
             title={editingId ? 'Editar Libro' : 'Crear Libro'}
             fields={formFields}
-            initialValues={initialValues ?? emptyValues}
+            initialValues={initialValues}
             onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
             loading={loading}

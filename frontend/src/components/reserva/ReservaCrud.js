@@ -9,7 +9,13 @@ export default function ReservaCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState({});
+  //Valores vacíos para crear 
+  const emptyValues = { 
+    idUsuario: "", 
+    idLibro: "", 
+    fechaReserva: ""
+  };
+  const [initialValues, setInitialValues] = useState(emptyValues);
 
   useEffect(() => { load(); }, []);
 
@@ -34,7 +40,6 @@ export default function ReservaCrud() {
     setInitialValues({
       idReserva: reserva.idReserva,
       fechaReserva: reserva.fechaReserva,
-      activa: reserva.activa,
       idUsuario: reserva.idUsuario,
       idLibro: reserva.idLibro
     });
@@ -96,7 +101,11 @@ export default function ReservaCrud() {
     <div>
       <CollectionView title="Reservas" items={items} columns={columns} onRefresh={load}>
         <div style={{marginTop: 12}}>
-          <button className="btn" onClick={() => { setShowForm(!showForm); setEditingId(null); }}>
+          <button className="btn" onClick={() => { 
+            setInitialValues(emptyValues); 
+            setEditingId(null); 
+            setShowForm(true); 
+            }}>
             {showForm ? 'Ocultar formulario' : '+ Nueva Reserva'}
           </button>
         </div>
@@ -105,10 +114,10 @@ export default function ReservaCrud() {
           <FormComponent
             key={editingId ?? 'new'}
             title={editingId ? 'Editar Reserva' : 'Crear Reserva'}
+            fields={formFields}
             initialValues={initialValues} 
             onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingId(null); }}
-            fields={formFields}
             loading={loading}
           />
         )}

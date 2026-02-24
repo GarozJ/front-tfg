@@ -141,6 +141,8 @@ import React, { useState, useEffect } from 'react';
 import { getUsuarios, createUsuario, updateUsuario, deleteUsuario } from '../../api/apiClient';
 import CollectionView from '../common/CollectionView';
 import FormComponent from '../common/FormComponent';
+import { getRoles } from '../../api/apiClient';
+
 
 import TableActions from '../common/TableActions';
 
@@ -149,9 +151,17 @@ export default function UsuarioCrud() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState({}); // ← AÑADIDO
+  const [roles, setRoles] = useState([]);
+  //Valores vacíos para crear 
+  const emptyValues = { 
+    nombre: "",
+    apellidos:"",
+    email:"",
+    password:""
+  };
+  const [initialValues, setInitialValues] = useState(emptyValues); 
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); getRoles().then(setRoles)}, []);
 
   function load() {
     getUsuarios().then(setItems).catch(e => alert('Error al cargar: ' + e.message));
@@ -167,13 +177,8 @@ export default function UsuarioCrud() {
   }
 
   // EDITAR → carga datos en el formulario
-  function handleEdit(id) {
-    
-    console.log("ID recibido:", id); 
-    console.log("Items:", items);
-    
-    const usuario = items.find(u => u.usuarioId === id);
-    console.log("Usuario encontrado:", usuario);
+  function handleEdit(id) { 
+    const usuario = items.find(u => u.idUsuario === id);
 
     setEditingId(id);
 
@@ -182,8 +187,7 @@ export default function UsuarioCrud() {
       nombre: usuario.nombre,
       apellidos: usuario.apellidos,
       email: usuario.email,
-      password: "",
-      rol: usuario.rol.idRol
+      password:usuario.password
     });
 
     setShowForm(true);
@@ -228,9 +232,8 @@ export default function UsuarioCrud() {
       render: (item) => { 
         console.log("ITEM EN COLUMNAS:", item); 
         return ( <TableActions 
-          id={item.usuarioId} 
-          onEdit={() => handleEdit(item.usuarioId)}
-          onDelete={() => handleDelete(item.usuarioId)} 
+          onEdit={() => handleEdit(item.idUsuario)}
+          onDelete={() => handleDelete(item.idUsuario)} 
           /> 
         ); 
       }
@@ -241,8 +244,7 @@ export default function UsuarioCrud() {
     { key: 'nombre', label: 'Nombre', placeholder: 'Nombre del usuario' },
     { key: 'apellidos', label: 'Apellidos', placeholder: 'Apellidos del usuario' },
     { key: 'email', label: 'Email', placeholder: 'email@example.com' },
-    { key: 'password', label: 'Contraseña', placeholder: 'Contraseña' },
-    { key: 'rol', label: 'Rol', placeholder: 'Rol' }
+    { key: 'password', label: 'Contraseña', type: 'password', placeholder: 'Nueva contraseña (opcional)' }
   ];
 
   return (
@@ -250,9 +252,9 @@ export default function UsuarioCrud() {
       <CollectionView title="Usuarios" items={items} columns={columns} onRefresh={load}>
         <div style={{marginTop: 12}}>
           <button className="btn" onClick={() => { 
-            setShowForm(!showForm); 
-            setEditingId(null);
-            setInitialValues({});
+            setInitialValues(emptyValues); 
+            setEditingId(null); 
+            setShowForm(true);
           }}>
             {showForm ? 'Ocultar formulario' : '+ Nuevo Usuario'}
           </button>
@@ -262,10 +264,10 @@ export default function UsuarioCrud() {
           <FormComponent 
             key={editingId ?? 'new'} 
             title={editingId !==null ? "Editar Usuario" : "Crear Usuario"} 
+            fields={formFields}
             initialValues={initialValues} 
             onSubmit={handleSubmit} 
             onCancel={() => { setShowForm(false); setEditingId(null); }}
-            fields={formFields}
             loading={loading}
           />
         )}

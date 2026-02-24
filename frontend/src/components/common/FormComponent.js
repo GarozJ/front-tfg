@@ -86,10 +86,12 @@ export default function FormComponent({
     setData({ ...data, [key]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     onSubmit(data);
   };
+
+const isEditing = Object.keys(initialValues) 
+.some(k => k.toLowerCase().includes("id"));
 
   return (
     <div className="card" style={{ marginTop: 16 }}>
@@ -111,6 +113,7 @@ export default function FormComponent({
             }}> 
               {f.label} 
             </label> 
+            
             {f.type === 'textarea' ? ( 
               <textarea 
                 className="input" 
@@ -137,7 +140,8 @@ export default function FormComponent({
 
       <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
         <button className="btn" onClick={handleSubmit} disabled={loading}> 
-          {loading ? 'Guardando...' : (initialValues?.idUsuario ? 'Actualizar' : 'Guardar')} 
+          {
+          loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Guardar')} 
         </button>
         <button className="btn secondary" onClick={onCancel}>Cancelar</button>
       </div>
